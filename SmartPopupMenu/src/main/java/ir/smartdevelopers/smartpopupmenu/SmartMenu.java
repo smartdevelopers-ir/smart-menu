@@ -1,0 +1,216 @@
+package ir.smartdevelopers.smartpopupmenu;
+
+import android.animation.ValueAnimator;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Rect;
+import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class SmartMenu extends FrameLayout {
+    private View mView;
+    private final Rect offset=new Rect();
+    private final LinearLayout mMenuLayout;
+    private final ArrayList<MenuItem> mMenuItems=new ArrayList<>();
+    private final int margin;
+    private final int margin8;
+    private final int deviceWidth;
+    private final int deviceHeight;
+    private boolean mShowDivider=true;
+    private boolean mCancelable=true;
+    private OnMenuItemClickListener mOnMenuItemClickListener;
+    public SmartMenu(@NonNull Context context) {
+        super(context);
+        setOnClickListener(v->{
+            if (mCancelable){
+                close();
+            }
+        });
+        DisplayMetrics metrics=getResources().getDisplayMetrics();
+        mMenuLayout=new LinearLayout(context);
+        mMenuLayout.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        mMenuLayout.setOrientation(LinearLayout.VERTICAL);
+        int padding= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8,metrics);
+        mMenuLayout.setPadding(0,padding,0,padding);
+        mMenuLayout.setBackgroundResource(R.drawable.menu_bg);
+        addView(mMenuLayout);
+        margin= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,24,metrics);
+        margin8= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8,metrics);
+        deviceWidth=metrics.widthPixels;
+        deviceHeight=metrics.heightPixels;
+    }
+
+
+
+
+    public SmartMenu addMenu(MenuItem menuItem){
+        mMenuItems.add(menuItem);
+        return this;
+    }
+    public SmartMenu addMenus(List<MenuItem> menuItems){
+        mMenuItems.addAll(menuItems);
+        return this;
+    }
+    public void removeMenu(MenuItem menuItem){
+        int menuPos=mMenuItems.indexOf(menuItem);
+        if (menuPos==-1){
+            return;
+        }
+        if (mMenuLayout.getChildCount() == 0){
+            return;
+        }
+        int menuItemViewPos=mShowDivider ?  menuPos*2 : menuPos;
+        int dividerViewPos=mShowDivider ? menuItemViewPos-1 : -1;
+        mMenuLayout.removeViewAt(menuItemViewPos);
+        if (dividerViewPos>=0){
+            mMenuLayout.removeViewAt(dividerViewPos);
+        }
+        mMenuItems.remove(menuPos);
+    }
+
+    public SmartMenu setShowDivider(boolean showDivider) {
+        mShowDivider = showDivider;
+        return this;
+    }
+
+    public SmartMenu setCancelable(boolean cancelable) {
+        mCancelable = cancelable;
+        return this;
+    }
+
+    public void show(View view){
+        mView=view;
+        addAllMenus();
+        mMenuLayout.measure(MeasureSpec.makeMeasureSpec(deviceWidth-(margin*2),MeasureSpec.AT_MOST),
+                MeasureSpec.makeMeasureSpec(deviceHeight-(margin*2),MeasureSpec.AT_MOST) );
+        view.getDrawingRect(offset);
+        ViewGroup parent= (ViewGroup) view.getRootView();
+        parent.offsetDescendantRectToMyCoords(view,offset);
+        setBackgroundColor(Color.parseColor("#66000000"));
+        ViewGroup.LayoutParams params=new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        parent.addView(this,params);
+
+        int y;
+        int x;
+        if (getLayoutDirection()==LAYOUT_DIRECTION_RTL){
+            int leftPos=offset.right + mMenuLayout.getMeasuredWidth() + margin8;
+            if (leftPos > deviceWidth - margin){
+                leftPos=deviceWidth - margin;
+            }
+            x=leftPos - mMenuLayout.getMeasuredWidth();
+            mMenuLayout.setPivotX(0);
+        }else {
+            int xpos=offset.left-mMenuLayout.getMeasuredWidth()-margin8;
+            if (xpos < margin){
+                xpos=margin;
+            }
+            x=xpos;
+            mMenuLayout.setPivotX(mMenuLayout.getMeasuredWidth());
+        }
+        if (offset.centerY()>deviceHeight/2){
+            // in bottom middle
+            int bottomPos=offset.bottom + (mMenuLayout.getMeasuredHeight()/3);
+            if (bottomPos > deviceHeight - margin){
+                bottomPos=deviceHeight - margin;
+            }
+            y=bottomPos-mMenuLayout.getMeasuredHeight();
+        }else {
+            // in top middle
+            int ypos=offset.top - (mMenuLayout.getMeasuredHeight()/3);
+            if (ypos < margin){
+                ypos=margin;
+            }
+            y=ypos;
+        }
+
+        mMenuLayout.setX(x);
+        mMenuLayout.setY(y);
+
+        mMenuLayout.setScaleX(0.9f);
+        mMenuLayout.setScaleY(0.9f);
+        mMenuLayout.setAlpha(0);
+
+        mMenuLayout.setPivotY(mMenuLayout.getMeasuredHeight());
+        setAlpha(0);
+        post(()->{
+            int duration=150;
+            animate().alpha(1).setDuration(duration).start();
+            mMenuLayout.animate().setDuration(duration)
+                    .alpha(1).scaleX(1).scaleY(1)
+                    .setInterpolator(new OvershootInterpolator())
+                    .start();
+        });
+
+    }
+
+    private void addAllMenus() {
+        if (mMenuLayout!=null){
+            mMenuLayout.removeAllViewsInLayout();
+            for (MenuItem menuItem : mMenuItems){
+                if (mMenuLayout.getChildCount()>0 && mShowDivider){
+                    View divider= LayoutInflater.from(getContext()).inflate(R.layout.divider,mMenuLayout,false);
+                    mMenuLayout.addView(divider);
+                }
+                View itemView=LayoutInflater.from(getContext()).inflate(R.layout.menu_item,mMenuLayout,false);
+                TextView title=itemView.findViewById(R.id.txtTitle);
+                ImageView imgIcon=itemView.findViewById(R.id.imgIcon);
+                title.setText(menuItem.getTitle());
+                imgIcon.setImageResource(menuItem.getIconRes());
+                itemView.setTag(menuItem);
+                itemView.setOnClickListener(v->{
+                    if (mOnMenuItemClickListener != null) {
+                        mOnMenuItemClickListener.onMenuItemClicked((MenuItem) itemView.getTag());
+                    }
+                    close();
+                });
+                mMenuLayout.addView(itemView);
+            }
+        }
+    }
+
+    public void close(){
+        animate().alpha(0).start();
+        mMenuLayout.animate().alpha(0).withEndAction(()->{
+            if (getParent()!=null){
+                ((ViewGroup)getParent()).removeView(this);
+            }
+        }).start();
+
+    }
+    @Override
+    protected void onDraw(Canvas canvas) {
+        canvas.save();
+        canvas.translate(offset.left,offset.top);
+        mView.draw(canvas);
+        canvas.restore();
+        super.onDraw(canvas);
+
+    }
+
+    public SmartMenu setOnMenuItemClickListener(OnMenuItemClickListener onMenuItemClickListener) {
+        mOnMenuItemClickListener = onMenuItemClickListener;
+        return this;
+    }
+
+    public interface OnMenuItemClickListener{
+        void onMenuItemClicked(MenuItem menuItem);
+    }
+}
