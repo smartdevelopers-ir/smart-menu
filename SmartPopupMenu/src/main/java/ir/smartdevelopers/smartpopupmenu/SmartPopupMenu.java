@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,7 @@ public class SmartPopupMenu extends FrameLayout {
     private int itemTextColor;
     private int itemIconTintColor;
     private OnMenuItemClickListener mOnMenuItemClickListener;
+    private boolean mShowing;
     public SmartPopupMenu(@NonNull Context context) {
         super(context);
         setOnClickListener(v->{
@@ -164,7 +166,7 @@ public class SmartPopupMenu extends FrameLayout {
                     .setInterpolator(new OvershootInterpolator())
                     .start();
         });
-
+        mShowing=true;
     }
 
     private void addAllMenus() {
@@ -204,7 +206,9 @@ public class SmartPopupMenu extends FrameLayout {
             if (getParent()!=null){
                 ((ViewGroup)getParent()).removeView(this);
             }
+
         }).start();
+        mShowing=false;
 
     }
     @Override
@@ -245,6 +249,11 @@ public class SmartPopupMenu extends FrameLayout {
             ViewCompat.setElevation(mMenuLayout,elevation);
         }
     }
+
+    public boolean isShowing() {
+        return mShowing;
+    }
+
     public interface OnMenuItemClickListener{
         void onMenuItemClicked(MenuItem menuItem);
     }
