@@ -63,6 +63,17 @@ public class SmartPopupMenu extends FrameLayout {
         ViewCompat.setElevation(mMenuLayout,margin8);
         deviceWidth=metrics.widthPixels;
         deviceHeight=metrics.heightPixels;
+        setFocusableInTouchMode(true);
+        setOnKeyListener(new OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK){
+                    close();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
 
@@ -167,6 +178,7 @@ public class SmartPopupMenu extends FrameLayout {
                     .start();
         });
         mShowing=true;
+        requestFocus();
     }
 
     private void addAllMenus() {
@@ -201,6 +213,7 @@ public class SmartPopupMenu extends FrameLayout {
     }
 
     public void close(){
+        clearFocus();
         animate().alpha(0).start();
         mMenuLayout.animate().alpha(0).withEndAction(()->{
             if (getParent()!=null){
