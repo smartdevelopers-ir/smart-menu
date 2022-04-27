@@ -54,10 +54,11 @@ public class SmartPopupMenu extends FrameLayout {
         mMenuLayout.setOrientation(LinearLayout.VERTICAL);
         int padding= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8,metrics);
         mMenuLayout.setPadding(0,padding,0,padding);
-        setMenuBackgroundColor(Color.parseColor("#F4F4F4"));
+        setMenuBackgroundColor(Color.parseColor("#FEFEFE"));
         addView(mMenuLayout);
         margin= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,24,metrics);
         margin8= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8,metrics);
+        ViewCompat.setElevation(mMenuLayout,margin8);
         deviceWidth=metrics.widthPixels;
         deviceHeight=metrics.heightPixels;
     }
@@ -239,6 +240,11 @@ public class SmartPopupMenu extends FrameLayout {
         return this;
     }
 
+    public void setMenuElevation(float elevation){
+        if (mMenuLayout != null) {
+            ViewCompat.setElevation(mMenuLayout,elevation);
+        }
+    }
     public interface OnMenuItemClickListener{
         void onMenuItemClicked(MenuItem menuItem);
     }
