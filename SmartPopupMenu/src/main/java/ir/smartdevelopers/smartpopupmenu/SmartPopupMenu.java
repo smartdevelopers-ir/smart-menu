@@ -1,11 +1,12 @@
 package ir.smartdevelopers.smartpopupmenu;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.util.AttributeSet;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -18,12 +19,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.widget.ImageViewCompat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SmartMenu extends FrameLayout {
+public class SmartPopupMenu extends FrameLayout {
     private View mView;
     private final Rect offset=new Rect();
     private final LinearLayout mMenuLayout;
@@ -34,8 +37,10 @@ public class SmartMenu extends FrameLayout {
     private final int deviceHeight;
     private boolean mShowDivider=true;
     private boolean mCancelable=true;
+    private int itemTextColor;
+    private int itemIconTintColor;
     private OnMenuItemClickListener mOnMenuItemClickListener;
-    public SmartMenu(@NonNull Context context) {
+    public SmartPopupMenu(@NonNull Context context) {
         super(context);
         setOnClickListener(v->{
             if (mCancelable){
@@ -49,7 +54,7 @@ public class SmartMenu extends FrameLayout {
         mMenuLayout.setOrientation(LinearLayout.VERTICAL);
         int padding= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8,metrics);
         mMenuLayout.setPadding(0,padding,0,padding);
-        mMenuLayout.setBackgroundResource(R.drawable.menu_bg);
+        setMenuBackgroundColor(Color.parseColor("#F4F4F4"));
         addView(mMenuLayout);
         margin= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,24,metrics);
         margin8= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8,metrics);
@@ -60,11 +65,11 @@ public class SmartMenu extends FrameLayout {
 
 
 
-    public SmartMenu addMenu(MenuItem menuItem){
+    public SmartPopupMenu addMenu(MenuItem menuItem){
         mMenuItems.add(menuItem);
         return this;
     }
-    public SmartMenu addMenus(List<MenuItem> menuItems){
+    public SmartPopupMenu addMenus(List<MenuItem> menuItems){
         mMenuItems.addAll(menuItems);
         return this;
     }
@@ -85,12 +90,12 @@ public class SmartMenu extends FrameLayout {
         mMenuItems.remove(menuPos);
     }
 
-    public SmartMenu setShowDivider(boolean showDivider) {
+    public SmartPopupMenu setShowDivider(boolean showDivider) {
         mShowDivider = showDivider;
         return this;
     }
 
-    public SmartMenu setCancelable(boolean cancelable) {
+    public SmartPopupMenu setCancelable(boolean cancelable) {
         mCancelable = cancelable;
         return this;
     }
@@ -173,7 +178,13 @@ public class SmartMenu extends FrameLayout {
                 TextView title=itemView.findViewById(R.id.txtTitle);
                 ImageView imgIcon=itemView.findViewById(R.id.imgIcon);
                 title.setText(menuItem.getTitle());
+                if (itemTextColor!=0){
+                    title.setTextColor(itemTextColor);
+                }
                 imgIcon.setImageResource(menuItem.getIconRes());
+                if (itemIconTintColor!=0){
+                    ImageViewCompat.setImageTintList(imgIcon,ColorStateList.valueOf(itemIconTintColor));
+                }
                 itemView.setTag(menuItem);
                 itemView.setOnClickListener(v->{
                     if (mOnMenuItemClickListener != null) {
@@ -205,7 +216,25 @@ public class SmartMenu extends FrameLayout {
 
     }
 
-    public SmartMenu setOnMenuItemClickListener(OnMenuItemClickListener onMenuItemClickListener) {
+    public void setMenuBackgroundColor(int menuBackgroundColor) {
+        float cornerRadius=TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,16,getResources().getDisplayMetrics());
+        GradientDrawable bg=new GradientDrawable();
+        bg.setColor(menuBackgroundColor);
+        bg.setCornerRadius(cornerRadius);
+        if (mMenuLayout != null) {
+            mMenuLayout.setBackground(bg);
+        }
+    }
+
+    public void setItemTextColor(int itemTextColor) {
+        this.itemTextColor = itemTextColor;
+    }
+
+    public void setItemIconTintColor(int itemIconTintColor) {
+        this.itemIconTintColor = itemIconTintColor;
+    }
+
+    public SmartPopupMenu setOnMenuItemClickListener(OnMenuItemClickListener onMenuItemClickListener) {
         mOnMenuItemClickListener = onMenuItemClickListener;
         return this;
     }
@@ -213,4 +242,5 @@ public class SmartMenu extends FrameLayout {
     public interface OnMenuItemClickListener{
         void onMenuItemClicked(MenuItem menuItem);
     }
+
 }
