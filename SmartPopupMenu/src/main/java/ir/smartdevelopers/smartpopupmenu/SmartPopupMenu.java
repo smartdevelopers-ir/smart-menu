@@ -116,6 +116,9 @@ public class SmartPopupMenu extends FrameLayout {
 
     public void show(View view){
         mView=view;
+        if (getParent() !=null){
+            ((ViewGroup)getParent()).removeViewInLayout(this);
+        }
         addAllMenus();
         mMenuLayout.measure(MeasureSpec.makeMeasureSpec(deviceWidth-(margin*2),MeasureSpec.AT_MOST),
                 MeasureSpec.makeMeasureSpec(deviceHeight-(margin*2),MeasureSpec.AT_MOST) );
@@ -129,7 +132,7 @@ public class SmartPopupMenu extends FrameLayout {
 
         int y;
         int x;
-        if (getLayoutDirection()==LAYOUT_DIRECTION_RTL){
+        if (view.getRootView().getLayoutDirection()==LAYOUT_DIRECTION_RTL){
             int leftPos=offset.right + mMenuLayout.getMeasuredWidth() + margin8;
             if (leftPos > deviceWidth - margin){
                 leftPos=deviceWidth - margin;
@@ -160,7 +163,7 @@ public class SmartPopupMenu extends FrameLayout {
             y=ypos;
         }
 
-        mMenuLayout.setX(x);
+
         mMenuLayout.setY(y);
 
         mMenuLayout.setScaleX(0.9f);
@@ -170,6 +173,7 @@ public class SmartPopupMenu extends FrameLayout {
         mMenuLayout.setPivotY(mMenuLayout.getMeasuredHeight());
         setAlpha(0);
         post(()->{
+            mMenuLayout.setX(x);
             int duration=150;
             animate().alpha(1).setDuration(duration).start();
             mMenuLayout.animate().setDuration(duration)
