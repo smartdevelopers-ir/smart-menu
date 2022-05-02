@@ -118,6 +118,14 @@ public class SmartPopupMenu extends FrameLayout {
         return mMenuItems;
     }
 
+    public void setItemMenuEnabled(int menuItemId,boolean enabled){
+        for (MenuItem item:mMenuItems){
+            if (item.getId()==menuItemId){
+                item.setEnabled(enabled);
+                break;
+            }
+        }
+    }
 
     public void show(View view){
         mView=view;
