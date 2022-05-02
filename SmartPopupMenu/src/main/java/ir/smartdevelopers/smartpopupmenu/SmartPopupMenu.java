@@ -197,12 +197,14 @@ public class SmartPopupMenu extends FrameLayout {
                 TextView title=itemView.findViewById(R.id.txtTitle);
                 ImageView imgIcon=itemView.findViewById(R.id.imgIcon);
                 title.setText(menuItem.getTitle());
-                if (itemTextColor!=0){
-                    title.setTextColor(itemTextColor);
+                int textColor=menuItem.getTextColor()==0 ? itemTextColor : menuItem.getTextColor();
+                if (textColor!=0){
+                    title.setTextColor(textColor);
                 }
                 imgIcon.setImageResource(menuItem.getIconRes());
-                if (itemIconTintColor!=0){
-                    ImageViewCompat.setImageTintList(imgIcon,ColorStateList.valueOf(itemIconTintColor));
+                int iconTint=menuItem.getIconTint() == 0 ? itemIconTintColor : menuItem.getIconTint();
+                if (iconTint!=0){
+                    ImageViewCompat.setImageTintList(imgIcon,ColorStateList.valueOf(iconTint));
                 }
                 itemView.setTag(menuItem);
                 itemView.setOnClickListener(v->{

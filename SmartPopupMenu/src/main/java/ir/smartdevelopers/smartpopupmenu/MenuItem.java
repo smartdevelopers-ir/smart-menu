@@ -6,6 +6,8 @@ public class MenuItem {
     private int id;
     private String title;
     private int mIconRes;
+    private int iconTint;
+    private int textColor;
 
     public MenuItem(int id, String title, int iconRes) {
         this.id = id;
@@ -48,5 +50,21 @@ public class MenuItem {
     @Override
     public int hashCode() {
         return Objects.hash(id, title);
+    }
+
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
+    }
+
+    public void setIconTint(int iconTint) {
+        this.iconTint = iconTint;
+    }
+
+    public int getIconTint() {
+        return iconTint;
+    }
+
+    public int getTextColor() {
+        return textColor;
     }
 }
