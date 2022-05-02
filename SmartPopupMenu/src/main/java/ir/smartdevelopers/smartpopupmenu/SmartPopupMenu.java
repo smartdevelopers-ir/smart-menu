@@ -38,8 +38,8 @@ public class SmartPopupMenu extends FrameLayout {
     private final int deviceHeight;
     private boolean mShowDivider=true;
     private boolean mCancelable=true;
-    private int itemTextColor;
-    private int itemIconTintColor;
+    private ColorStateList itemTextColor;
+    private ColorStateList itemIconTintColor;
     private OnMenuItemClickListener mOnMenuItemClickListener;
     private boolean mShowing;
     public SmartPopupMenu(@NonNull Context context) {
@@ -113,6 +113,11 @@ public class SmartPopupMenu extends FrameLayout {
         mCancelable = cancelable;
         return this;
     }
+
+    public ArrayList<MenuItem> getMenuItems() {
+        return mMenuItems;
+    }
+
 
     public void show(View view){
         mView=view;
@@ -197,22 +202,27 @@ public class SmartPopupMenu extends FrameLayout {
                 TextView title=itemView.findViewById(R.id.txtTitle);
                 ImageView imgIcon=itemView.findViewById(R.id.imgIcon);
                 title.setText(menuItem.getTitle());
-                int textColor=menuItem.getTextColor()==0 ? itemTextColor : menuItem.getTextColor();
-                if (textColor!=0){
+                ColorStateList textColor=menuItem.getTextColor()==null ? itemTextColor : menuItem.getTextColor();
+                if (textColor!=null){
                     title.setTextColor(textColor);
                 }
                 imgIcon.setImageResource(menuItem.getIconRes());
-                int iconTint=menuItem.getIconTint() == 0 ? itemIconTintColor : menuItem.getIconTint();
-                if (iconTint!=0){
-                    ImageViewCompat.setImageTintList(imgIcon,ColorStateList.valueOf(iconTint));
+                ColorStateList iconTint=menuItem.getIconTint() == null ? itemIconTintColor : menuItem.getIconTint();
+                if (iconTint!=null){
+                    ImageViewCompat.setImageTintList(imgIcon,iconTint);
                 }
                 itemView.setTag(menuItem);
                 itemView.setOnClickListener(v->{
-                    if (mOnMenuItemClickListener != null) {
-                        mOnMenuItemClickListener.onMenuItemClicked((MenuItem) itemView.getTag());
+                    if (menuItem.isEnabled()) {
+                        if (mOnMenuItemClickListener != null) {
+                            mOnMenuItemClickListener.onMenuItemClicked((MenuItem) itemView.getTag());
+                        }
+                        close();
                     }
-                    close();
                 });
+                itemView.setEnabled(menuItem.isEnabled());
+                title.setEnabled(menuItem.isEnabled());
+                imgIcon.setEnabled(menuItem.isEnabled());
                 mMenuLayout.addView(itemView);
             }
         }
@@ -251,13 +261,18 @@ public class SmartPopupMenu extends FrameLayout {
     }
 
     public void setItemTextColor(int itemTextColor) {
-        this.itemTextColor = itemTextColor;
+        this.itemTextColor = ColorStateList.valueOf(itemTextColor);
+    }
+    public void setItemTextColor(ColorStateList itemTextColor){
+        this.itemTextColor=itemTextColor;
     }
 
     public void setItemIconTintColor(int itemIconTintColor) {
+        this.itemIconTintColor =  ColorStateList.valueOf(itemIconTintColor);
+    }
+    public void setItemIconTintColor(ColorStateList itemIconTintColor) {
         this.itemIconTintColor = itemIconTintColor;
     }
-
     public SmartPopupMenu setOnMenuItemClickListener(OnMenuItemClickListener onMenuItemClickListener) {
         mOnMenuItemClickListener = onMenuItemClickListener;
         return this;

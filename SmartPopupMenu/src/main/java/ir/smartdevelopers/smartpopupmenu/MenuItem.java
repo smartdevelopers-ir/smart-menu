@@ -1,18 +1,22 @@
 package ir.smartdevelopers.smartpopupmenu;
 
+import android.content.res.ColorStateList;
+
 import java.util.Objects;
 
 public class MenuItem {
     private int id;
     private String title;
     private int mIconRes;
-    private int iconTint;
-    private int textColor;
+    private ColorStateList iconTint;
+    private ColorStateList textColor;
+    private boolean enabled;
 
     public MenuItem(int id, String title, int iconRes) {
         this.id = id;
         this.title = title;
         mIconRes = iconRes;
+        enabled=true;
     }
 
     public String getTitle() {
@@ -52,19 +56,36 @@ public class MenuItem {
         return Objects.hash(id, title);
     }
 
-    public void setTextColor(int textColor) {
-        this.textColor = textColor;
-    }
+
 
     public void setIconTint(int iconTint) {
+        this.iconTint = ColorStateList.valueOf(iconTint);
+    }
+    public void setIconTint(ColorStateList iconTint) {
         this.iconTint = iconTint;
     }
-
-    public int getIconTint() {
+    public ColorStateList getIconTint() {
         return iconTint;
     }
 
-    public int getTextColor() {
+
+    public void setTextColor(int textColor) {
+        this.textColor = ColorStateList.valueOf(textColor);
+    }
+    public void setTextColor(ColorStateList textColor) {
+        this.textColor = textColor;
+    }
+    public ColorStateList getTextColor() {
         return textColor;
+    }
+
+
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }
