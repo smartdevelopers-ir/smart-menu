@@ -329,6 +329,12 @@ public class SmartPopupMenu extends FrameLayout {
         }
         return null;
     }
+    public void setMenuItemVisible(int itemId,boolean visible){
+        MenuItem item=getMenuItem(itemId);
+        if (item != null) {
+            item.setVisible(visible);
+        }
+    }
     public boolean isShowing() {
         return mShowing;
     }
