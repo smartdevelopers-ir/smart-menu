@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.InsetDrawable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -42,6 +43,7 @@ public class SmartPopupMenu extends FrameLayout {
     private ColorStateList itemIconTintColor;
     private OnMenuItemClickListener mOnMenuItemClickListener;
     private boolean mShowing;
+    private int mDividerColor;
     public SmartPopupMenu(@NonNull Context context) {
         super(context);
         setOnClickListener(v->{
@@ -74,6 +76,7 @@ public class SmartPopupMenu extends FrameLayout {
                 return false;
             }
         });
+        mDividerColor=Color.parseColor("#72707070");
     }
 
 
@@ -83,15 +86,23 @@ public class SmartPopupMenu extends FrameLayout {
         mMenuItems.add(menuItem);
         return this;
     }
+    public SmartPopupMenu addMenu(MenuItem menuItem,int position){
+        mMenuItems.add(position,menuItem);
+        return this;
+    }
     public SmartPopupMenu addMenus(List<MenuItem> menuItems){
         mMenuItems.addAll(menuItems);
         return this;
     }
     public void removeMenu(MenuItem menuItem){
         int menuPos=mMenuItems.indexOf(menuItem);
-        if (menuPos==-1){
+        if (menuPos < 0){
             return;
         }
+        removeMenu(menuPos);
+    }
+    public void removeMenu(int menuPos){
+
         if (mMenuLayout.getChildCount() == 0){
             return;
         }
@@ -131,6 +142,24 @@ public class SmartPopupMenu extends FrameLayout {
         mView=view;
         if (getParent() !=null){
             ((ViewGroup)getParent()).removeViewInLayout(this);
+        }
+        if (mShowDivider) {
+
+            int insetStart= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,56,getResources().getDisplayMetrics());
+            int insetEnd= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,16,getResources().getDisplayMetrics());
+            mMenuLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+            GradientDrawable dividerLineDrawable=new GradientDrawable();
+            dividerLineDrawable.setColor(mDividerColor);
+            dividerLineDrawable.setSize(-1,3);
+            InsetDrawable dividerDrawable;
+            if (view.getRootView().getLayoutDirection()==LAYOUT_DIRECTION_RTL){
+                dividerDrawable=new InsetDrawable(dividerLineDrawable,insetEnd,0,insetStart,0);
+            }else {
+                dividerDrawable=new InsetDrawable(dividerLineDrawable,insetStart,0,insetEnd,0);
+            }
+            mMenuLayout.setDividerDrawable(dividerDrawable);
+        }else {
+            mMenuLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
         }
         addAllMenus();
         mMenuLayout.measure(MeasureSpec.makeMeasureSpec(deviceWidth-(margin*2),MeasureSpec.AT_MOST),
@@ -201,10 +230,10 @@ public class SmartPopupMenu extends FrameLayout {
     private void addAllMenus() {
         if (mMenuLayout!=null){
             mMenuLayout.removeAllViewsInLayout();
+
             for (MenuItem menuItem : mMenuItems){
-                if (mMenuLayout.getChildCount()>0 && mShowDivider){
-                    View divider= LayoutInflater.from(getContext()).inflate(R.layout.divider,mMenuLayout,false);
-                    mMenuLayout.addView(divider);
+                if (!menuItem.isVisible()){
+                    continue;
                 }
                 View itemView=LayoutInflater.from(getContext()).inflate(R.layout.menu_item,mMenuLayout,false);
                 TextView title=itemView.findViewById(R.id.txtTitle);
@@ -294,6 +323,11 @@ public class SmartPopupMenu extends FrameLayout {
 
     public boolean isShowing() {
         return mShowing;
+    }
+
+    public SmartPopupMenu setDividerColor(int dividerColor) {
+        mDividerColor = dividerColor;
+        return this;
     }
 
     public interface OnMenuItemClickListener{

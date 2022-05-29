@@ -11,12 +11,14 @@ public class MenuItem {
     private ColorStateList iconTint;
     private ColorStateList textColor;
     private boolean enabled;
+    private boolean visible;
 
     public MenuItem(int id, String title, int iconRes) {
         this.id = id;
         this.title = title;
         mIconRes = iconRes;
         enabled=true;
+        visible=true;
     }
 
     public String getTitle() {
@@ -87,5 +89,13 @@ public class MenuItem {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }
