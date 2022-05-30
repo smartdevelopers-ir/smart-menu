@@ -143,6 +143,9 @@ public class SmartPopupMenu extends FrameLayout {
         if (getParent() !=null){
             ((ViewGroup)getParent()).removeViewInLayout(this);
         }
+        if (view.getParent() != null) {
+            view.getParent().requestDisallowInterceptTouchEvent(true);
+        }
         if (mShowDivider) {
 
             int insetStart= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,56,getResources().getDisplayMetrics());
