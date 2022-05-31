@@ -170,10 +170,18 @@ public class SmartPopupMenu extends FrameLayout {
         view.getDrawingRect(offset);
         ViewGroup parent= (ViewGroup) view.getRootView();
         parent.offsetDescendantRectToMyCoords(view,offset);
+        offset.offset((int)view.getTranslationX(),(int)view.getTranslationY());
         setBackgroundColor(Color.parseColor("#66000000"));
         ViewGroup.LayoutParams params=new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         parent.addView(this,params);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            View navView=parent.findViewById(android.R.id.navigationBarBackground);
+            if (navView!=null){
+                parent.bringChildToFront(navView);
+            }
+        }
+
 
         int y;
         int x;
