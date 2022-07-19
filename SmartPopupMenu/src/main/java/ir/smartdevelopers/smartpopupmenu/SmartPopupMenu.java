@@ -5,7 +5,6 @@ import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.util.DisplayMetrics;
@@ -21,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.widget.ImageViewCompat;
 
@@ -44,6 +42,7 @@ public class SmartPopupMenu extends FrameLayout {
     private OnMenuItemClickListener mOnMenuItemClickListener;
     private boolean mShowing;
     private int mDividerColor;
+    private int mLayoutDirection;
     public SmartPopupMenu(@NonNull Context context) {
         super(context);
         setOnClickListener(v->{
@@ -185,7 +184,11 @@ public class SmartPopupMenu extends FrameLayout {
 
         int y;
         int x;
-        if (view.getRootView().getLayoutDirection()==LAYOUT_DIRECTION_RTL){
+        int layoutDirection=mLayoutDirection;
+        if (layoutDirection==0){
+            layoutDirection=view.getRootView().getLayoutDirection();
+        }
+        if (layoutDirection==LAYOUT_DIRECTION_RTL){
             int leftPos=offset.right + mMenuLayout.getMeasuredWidth() + margin8;
             if (leftPos > deviceWidth - margin){
                 leftPos=deviceWidth - margin;
@@ -353,6 +356,13 @@ public class SmartPopupMenu extends FrameLayout {
     public SmartPopupMenu setDividerColor(int dividerColor) {
         mDividerColor = dividerColor;
         return this;
+    }
+
+
+    public void setMenuLayoutDirection(int layoutDirection) {
+        this.mLayoutDirection = layoutDirection;
+        setLayoutDirection(layoutDirection);
+        mMenuLayout.setLayoutDirection(layoutDirection);
     }
 
     public interface OnMenuItemClickListener{
