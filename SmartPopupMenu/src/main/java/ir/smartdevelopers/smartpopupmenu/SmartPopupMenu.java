@@ -145,6 +145,10 @@ public class SmartPopupMenu extends FrameLayout {
         if (view.getParent() != null) {
             view.getParent().requestDisallowInterceptTouchEvent(true);
         }
+        int layoutDirection=mLayoutDirection;
+        if (layoutDirection==0){
+            layoutDirection=view.getRootView().getLayoutDirection();
+        }
         if (mShowDivider) {
 
             int insetStart= (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,56,getResources().getDisplayMetrics());
@@ -154,7 +158,7 @@ public class SmartPopupMenu extends FrameLayout {
             dividerLineDrawable.setColor(mDividerColor);
             dividerLineDrawable.setSize(-1,3);
             InsetDrawable dividerDrawable;
-            if (view.getRootView().getLayoutDirection()==LAYOUT_DIRECTION_RTL){
+            if (layoutDirection==LAYOUT_DIRECTION_RTL){
                 dividerDrawable=new InsetDrawable(dividerLineDrawable,insetEnd,0,insetStart,0);
             }else {
                 dividerDrawable=new InsetDrawable(dividerLineDrawable,insetStart,0,insetEnd,0);
@@ -184,10 +188,7 @@ public class SmartPopupMenu extends FrameLayout {
 
         int y;
         int x;
-        int layoutDirection=mLayoutDirection;
-        if (layoutDirection==0){
-            layoutDirection=view.getRootView().getLayoutDirection();
-        }
+
         if (layoutDirection==LAYOUT_DIRECTION_RTL){
             int leftPos=offset.right + mMenuLayout.getMeasuredWidth() + margin8;
             if (leftPos > deviceWidth - margin){
